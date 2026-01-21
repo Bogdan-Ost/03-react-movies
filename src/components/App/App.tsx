@@ -8,10 +8,11 @@ import type { Movie } from "../../types/movie";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
@@ -28,6 +29,10 @@ export default function App() {
       setIsLoading(true);
       setIsError(false);
       const newMovies = await fetchMovies(query);
+      if (newMovies.length === 0) {
+        toast.error("No movies found for your request.");
+        return;
+      }
       setMovies(newMovies);
     } catch {
       setIsError(true);
@@ -38,12 +43,13 @@ export default function App() {
   return (
     <div className={css.app}>
       <SearchBar onSubmit={handleSearch} />
-      {isLading && <Loader />}
+      {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={closeModal} />
       )}
+      <Toaster />
     </div>
   );
 }
