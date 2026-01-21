@@ -14,7 +14,11 @@ interface Settings {
   };
 }
 
-export const fetchMovies = async (query: string) => {
+interface fetchMoviesResponce {
+  results: Movie[];
+}
+
+export const fetchMovies = async (query: string): Promise<Movie[]> => {
   try {
     const settings: Settings = {
       params: {
@@ -24,13 +28,11 @@ export const fetchMovies = async (query: string) => {
         Authorization: `Bearer ${API_KEY}`,
       },
     };
-    const { data } = await axios.get<Movie>(BASE_URL, settings);
-    console.log(data);
+    const { data } = await axios.get<fetchMoviesResponce>(BASE_URL, settings);
 
-    return data;
+    return data.results;
   } catch (error) {
     console.error("Помилка запиту до API:", error);
-    // Викидаємо помилку далі, щоб компонент міг її обробити
     throw error;
   }
 };
